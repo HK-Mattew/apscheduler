@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from apscheduler import Scheduler
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4 import Scheduler
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 
 def tick():

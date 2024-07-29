@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 
-from apscheduler.triggers.cron import CronTrigger
+from apschedulerv4.triggers.cron import CronTrigger
 
 if sys.version_info >= (3, 9):
     from zoneinfo import ZoneInfo

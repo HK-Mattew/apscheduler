@@ -5,7 +5,7 @@ from typing import Any
 
 from attrs import Attribute
 
-from apscheduler._utils import unset
+from apschedulerv4._utils import unset
 
 
 def positive_number(instance: Any, attribute: Attribute, value: Any) -> None:

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 
 def test_bad_interval():

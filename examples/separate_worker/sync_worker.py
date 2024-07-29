@@ -16,9 +16,9 @@ import logging
 
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from apscheduler import Scheduler
-from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
-from apscheduler.eventbrokers.asyncpg import AsyncpgEventBroker
+from apschedulerv4 import Scheduler
+from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
+from apschedulerv4.eventbrokers.asyncpg import AsyncpgEventBroker
 
 logging.basicConfig(level=logging.INFO)
 engine = create_async_engine("postgresql+asyncpg://postgres:secret@localhost/testdb")

@@ -11,8 +11,8 @@ from __future__ import annotations
 from asyncio import run
 from datetime import datetime
 
-from apscheduler import AsyncScheduler
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4 import AsyncScheduler
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 
 def tick():

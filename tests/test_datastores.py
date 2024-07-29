@@ -12,7 +12,7 @@ import pytest
 from anyio import CancelScope
 from pytest_mock.plugin import MockerFixture
 
-from apscheduler import (
+from apschedulerv4 import (
     CoalescePolicy,
     ConflictPolicy,
     DeserializationError,
@@ -29,10 +29,10 @@ from apscheduler import (
     TaskLookupError,
     TaskUpdated,
 )
-from apscheduler._structures import ScheduleResult
-from apscheduler.abc import DataStore, EventBroker, Serializer
-from apscheduler.datastores.base import BaseExternalDataStore
-from apscheduler.triggers.date import DateTrigger
+from apschedulerv4._structures import ScheduleResult
+from apschedulerv4.abc import DataStore, EventBroker, Serializer
+from apschedulerv4.datastores.base import BaseExternalDataStore
+from apschedulerv4.triggers.date import DateTrigger
 
 if TYPE_CHECKING:
     from time_machine import TimeMachineFixture

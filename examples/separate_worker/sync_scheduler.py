@@ -16,10 +16,10 @@ import logging
 from example_tasks import tick
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from apscheduler import Scheduler
-from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
-from apscheduler.eventbrokers.asyncpg import AsyncpgEventBroker
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4 import Scheduler
+from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
+from apschedulerv4.eventbrokers.asyncpg import AsyncpgEventBroker
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 logging.basicConfig(level=logging.INFO)
 engine = create_async_engine("postgresql+asyncpg://postgres:secret@localhost/testdb")

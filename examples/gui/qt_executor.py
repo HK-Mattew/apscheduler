@@ -3,9 +3,9 @@ from __future__ import annotations
 import sys
 from datetime import datetime
 
-from apscheduler import Scheduler
-from apscheduler.executors.qt import QtJobExecutor
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4 import Scheduler
+from apschedulerv4.executors.qt import QtJobExecutor
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 try:
     from PySide6.QtWidgets import QApplication, QLabel, QMainWindow

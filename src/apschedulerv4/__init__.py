@@ -54,5 +54,5 @@ from ._utils import UnsetValue as UnsetValue
 # Re-export imports, so they look like they live directly in this package
 value: Any
 for value in list(locals().values()):
-    if getattr(value, "__module__", "").startswith("apscheduler."):
+    if getattr(value, "__module__", "").startswith("apschedulerv4."):
         value.__module__ = __name__

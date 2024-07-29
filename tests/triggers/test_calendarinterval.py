@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 import pytest
 
-from apscheduler.triggers.calendarinterval import CalendarIntervalTrigger
+from apschedulerv4.triggers.calendarinterval import CalendarIntervalTrigger
 
 
 def test_bad_interval(timezone):

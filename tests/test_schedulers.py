@@ -28,7 +28,7 @@ from anyio import (
 from pytest import MonkeyPatch
 from pytest_mock import MockerFixture, MockFixture
 
-from apscheduler import (
+from apschedulerv4 import (
     AsyncScheduler,
     CoalescePolicy,
     Event,
@@ -54,15 +54,15 @@ from apscheduler import (
     current_job,
     task,
 )
-from apscheduler.abc import DataStore
-from apscheduler.datastores.memory import MemoryDataStore
-from apscheduler.eventbrokers.local import LocalEventBroker
-from apscheduler.executors.async_ import AsyncJobExecutor
-from apscheduler.executors.subprocess import ProcessPoolJobExecutor
-from apscheduler.executors.thread import ThreadPoolJobExecutor
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.date import DateTrigger
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4.abc import DataStore
+from apschedulerv4.datastores.memory import MemoryDataStore
+from apschedulerv4.eventbrokers.local import LocalEventBroker
+from apschedulerv4.executors.async_ import AsyncJobExecutor
+from apschedulerv4.executors.subprocess import ProcessPoolJobExecutor
+from apschedulerv4.executors.thread import ThreadPoolJobExecutor
+from apschedulerv4.triggers.cron import CronTrigger
+from apschedulerv4.triggers.date import DateTrigger
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 if sys.version_info >= (3, 11):
     from datetime import UTC

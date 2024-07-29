@@ -4,12 +4,12 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from apscheduler import MaxIterationsReached
-from apscheduler.triggers.calendarinterval import CalendarIntervalTrigger
-from apscheduler.triggers.combining import AndTrigger, OrTrigger
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.date import DateTrigger
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4 import MaxIterationsReached
+from apschedulerv4.triggers.calendarinterval import CalendarIntervalTrigger
+from apschedulerv4.triggers.combining import AndTrigger, OrTrigger
+from apschedulerv4.triggers.cron import CronTrigger
+from apschedulerv4.triggers.date import DateTrigger
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 
 class TestAndTrigger:

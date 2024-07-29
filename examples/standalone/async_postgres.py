@@ -16,9 +16,9 @@ from datetime import datetime
 
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from apscheduler import AsyncScheduler
-from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4 import AsyncScheduler
+from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 
 def tick():

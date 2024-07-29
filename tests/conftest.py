@@ -12,11 +12,11 @@ import pytest
 from _pytest.fixtures import SubRequest
 from pytest_lazy_fixtures import lf
 
-from apscheduler.abc import DataStore, EventBroker, Serializer
-from apscheduler.datastores.memory import MemoryDataStore
-from apscheduler.serializers.cbor import CBORSerializer
-from apscheduler.serializers.json import JSONSerializer
-from apscheduler.serializers.pickle import PickleSerializer
+from apschedulerv4.abc import DataStore, EventBroker, Serializer
+from apschedulerv4.datastores.memory import MemoryDataStore
+from apschedulerv4.serializers.cbor import CBORSerializer
+from apschedulerv4.serializers.json import JSONSerializer
+from apschedulerv4.serializers.pickle import PickleSerializer
 
 if sys.version_info >= (3, 9):
     from zoneinfo import ZoneInfo
@@ -52,14 +52,14 @@ def anyio_backend() -> str:
 
 @pytest.fixture
 def local_broker() -> EventBroker:
-    from apscheduler.eventbrokers.local import LocalEventBroker
+    from apschedulerv4.eventbrokers.local import LocalEventBroker
 
     return LocalEventBroker()
 
 
 @pytest.fixture
 async def redis_broker(serializer: Serializer) -> EventBroker:
-    from apscheduler.eventbrokers.redis import RedisEventBroker
+    from apschedulerv4.eventbrokers.redis import RedisEventBroker
 
     broker = RedisEventBroker(
         "redis://localhost:6379", serializer=serializer, stop_check_interval=0.05
@@ -70,7 +70,7 @@ async def redis_broker(serializer: Serializer) -> EventBroker:
 
 @pytest.fixture
 def mqtt_broker(serializer: Serializer) -> EventBroker:
-    from apscheduler.eventbrokers.mqtt import MQTTEventBroker
+    from apschedulerv4.eventbrokers.mqtt import MQTTEventBroker
 
     return MQTTEventBroker(serializer=serializer)
 
@@ -78,7 +78,7 @@ def mqtt_broker(serializer: Serializer) -> EventBroker:
 @pytest.fixture
 async def asyncpg_broker(serializer: Serializer) -> EventBroker:
     pytest.importorskip("asyncpg", reason="asyncpg is not installed")
-    from apscheduler.eventbrokers.asyncpg import AsyncpgEventBroker
+    from apschedulerv4.eventbrokers.asyncpg import AsyncpgEventBroker
 
     broker = AsyncpgEventBroker(
         "postgres://postgres:secret@localhost:5432/testdb", serializer=serializer
@@ -89,7 +89,7 @@ async def asyncpg_broker(serializer: Serializer) -> EventBroker:
 @pytest.fixture
 async def psycopg_broker(serializer: Serializer) -> EventBroker:
     pytest.importorskip("psycopg", reason="psycopg is not installed")
-    from apscheduler.eventbrokers.psycopg import PsycopgEventBroker
+    from apschedulerv4.eventbrokers.psycopg import PsycopgEventBroker
 
     broker = PsycopgEventBroker(
         "postgres://postgres:secret@localhost:5432/testdb", serializer=serializer
@@ -142,7 +142,7 @@ def memory_store() -> Generator[DataStore, None, None]:
 def mongodb_store() -> Generator[DataStore, None, None]:
     from pymongo import MongoClient
 
-    from apscheduler.datastores.mongodb import MongoDBDataStore
+    from apschedulerv4.datastores.mongodb import MongoDBDataStore
 
     client: MongoClient
     with MongoClient(tz_aware=True, serverSelectionTimeoutMS=1000) as client:
@@ -154,7 +154,7 @@ async def psycopg_async_store() -> AsyncGenerator[DataStore, None]:
     from sqlalchemy import text
     from sqlalchemy.ext.asyncio import create_async_engine
 
-    from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
+    from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
     engine = create_async_engine(
         "postgresql+psycopg://postgres:secret@localhost/testdb"
@@ -175,7 +175,7 @@ async def psycopg_async_store() -> AsyncGenerator[DataStore, None]:
 def psycopg_sync_store() -> Generator[DataStore, None, None]:
     from sqlalchemy import create_engine, text
 
-    from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
+    from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
     engine = create_engine("postgresql+psycopg://postgres:secret@localhost/testdb")
     try:
@@ -194,7 +194,7 @@ def psycopg_sync_store() -> Generator[DataStore, None, None]:
 def pymysql_store() -> Generator[DataStore, None, None]:
     from sqlalchemy import create_engine
 
-    from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
+    from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
     engine = create_engine("mysql+pymysql://root:secret@localhost/testdb")
     try:
@@ -208,7 +208,7 @@ def pymysql_store() -> Generator[DataStore, None, None]:
 async def aiosqlite_store(tmp_path: Path) -> AsyncGenerator[DataStore, None]:
     from sqlalchemy.ext.asyncio import create_async_engine
 
-    from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
+    from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
     engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path}/test.db")
     try:
@@ -223,7 +223,7 @@ async def asyncpg_store() -> AsyncGenerator[DataStore, None]:
     from asyncpg import compat
     from sqlalchemy.ext.asyncio import create_async_engine
 
-    from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
+    from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
     # Workaround for AnyIO 4.0.0rc1 compatibility
     async def patched_wait_for(fut, timeout):
@@ -257,7 +257,7 @@ async def asyncmy_store() -> AsyncGenerator[DataStore, None]:
     pytest.importorskip("asyncmy", reason="asyncmy is not installed")
     from sqlalchemy.ext.asyncio import create_async_engine
 
-    from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
+    from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
     engine = create_async_engine(
         "mysql+asyncmy://root:secret@localhost/testdb?charset=utf8mb4", future=True

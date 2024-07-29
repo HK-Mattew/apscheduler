@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from apscheduler.triggers.date import DateTrigger
+from apschedulerv4.triggers.date import DateTrigger
 
 
 def test_run_time(timezone, serializer):

@@ -9,8 +9,8 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 from anyio import CancelScope, create_memory_object_stream, fail_after
 
-from apscheduler import Event, ScheduleAdded
-from apscheduler.abc import EventBroker
+from apschedulerv4 import Event, ScheduleAdded
+from apschedulerv4.abc import EventBroker
 
 if sys.version_info >= (3, 11):
     from datetime import UTC
@@ -130,7 +130,7 @@ def test_asyncpg_broker_from_async_engine() -> None:
     from sqlalchemy import URL
     from sqlalchemy.ext.asyncio import create_async_engine
 
-    from apscheduler.eventbrokers.asyncpg import AsyncpgEventBroker
+    from apschedulerv4.eventbrokers.asyncpg import AsyncpgEventBroker
 
     url = URL(
         "postgresql+asyncpg",
@@ -156,7 +156,7 @@ def test_psycopg_broker_from_async_engine() -> None:
     from sqlalchemy import URL
     from sqlalchemy.ext.asyncio import create_async_engine
 
-    from apscheduler.eventbrokers.psycopg import PsycopgEventBroker
+    from apschedulerv4.eventbrokers.psycopg import PsycopgEventBroker
 
     url = URL(
         "postgresql+psycopg",

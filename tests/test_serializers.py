@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import pytest
 
-from apscheduler import (
+from apschedulerv4 import (
     DeserializationError,
     Event,
     JobAdded,
@@ -14,7 +14,7 @@ from apscheduler import (
     JobReleased,
     SerializationError,
 )
-from apscheduler.abc import Serializer
+from apschedulerv4.abc import Serializer
 
 
 @pytest.mark.parametrize(

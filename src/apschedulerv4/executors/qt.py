@@ -10,8 +10,8 @@ import anyio
 import attrs
 from anyio.from_thread import BlockingPortal
 
-from apscheduler import Job, current_job
-from apscheduler.abc import JobExecutor
+from apschedulerv4 import Job, current_job
+from apschedulerv4.abc import JobExecutor
 
 if "PySide6" in sys.modules:
     from PySide6.QtCore import QObject, Signal

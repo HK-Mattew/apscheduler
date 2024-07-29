@@ -15,10 +15,10 @@ from datetime import datetime
 
 from sqlalchemy.future import create_engine
 
-from apscheduler import Scheduler
-from apscheduler.datastores.sqlalchemy import SQLAlchemyDataStore
-from apscheduler.eventbrokers.redis import RedisEventBroker
-from apscheduler.triggers.interval import IntervalTrigger
+from apschedulerv4 import Scheduler
+from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
+from apschedulerv4.eventbrokers.redis import RedisEventBroker
+from apschedulerv4.triggers.interval import IntervalTrigger
 
 
 def tick():
