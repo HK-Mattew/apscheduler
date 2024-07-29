@@ -30,12 +30,7 @@ from apschedulerv4 import (
     TaskLookupError,
     TaskUpdated,
 )
-<<<<<<< HEAD
-from apschedulerv4._structures import ScheduleResult
-from apschedulerv4.abc import DataStore, EventBroker, Serializer
-from apschedulerv4.datastores.base import BaseExternalDataStore
-from apschedulerv4.triggers.date import DateTrigger
-=======
+
 from apschedulerv4._structures import ScheduleResult
 from apschedulerv4.abc import DataStore, EventBroker, Serializer
 from apschedulerv4.datastores.base import BaseExternalDataStore
@@ -43,7 +38,7 @@ from apschedulerv4.datastores.memory import MemoryDataStore
 from apschedulerv4.datastores.mongodb import MongoDBDataStore
 from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 from apschedulerv4.triggers.date import DateTrigger
->>>>>>> upstream/master
+
 
 if TYPE_CHECKING:
     from time_machine import TimeMachineFixture
