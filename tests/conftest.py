@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import logging
-import sys
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, Generator
 from contextlib import AsyncExitStack
 from logging import Logger
 from pathlib import Path
-from typing import Any, AsyncGenerator, cast
+from typing import Any, cast
+from zoneinfo import ZoneInfo
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -17,11 +17,6 @@ from apschedulerv4.datastores.memory import MemoryDataStore
 from apschedulerv4.serializers.cbor import CBORSerializer
 from apschedulerv4.serializers.json import JSONSerializer
 from apschedulerv4.serializers.pickle import PickleSerializer
-
-if sys.version_info >= (3, 9):
-    from zoneinfo import ZoneInfo
-else:
-    from backports.zoneinfo import ZoneInfo
 
 
 @pytest.fixture(scope="session")
@@ -156,7 +151,6 @@ async def psycopg_async_store() -> AsyncGenerator[DataStore, None]:
 
     from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
-    pytest.importorskip("psycopg", reason="psycopg not available")
     engine = create_async_engine(
         "postgresql+psycopg://postgres:secret@localhost/testdb"
     )
@@ -178,7 +172,6 @@ def psycopg_sync_store() -> Generator[DataStore, None, None]:
 
     from apschedulerv4.datastores.sqlalchemy import SQLAlchemyDataStore
 
-    pytest.importorskip("psycopg", reason="psycopg not available")
     engine = create_engine("postgresql+psycopg://postgres:secret@localhost/testdb")
     try:
         with engine.begin() as conn:

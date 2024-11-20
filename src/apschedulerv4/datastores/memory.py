@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from bisect import bisect_left, bisect_right, insort_right
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from datetime import MAXYEAR, datetime, timedelta, timezone
 from functools import partial
-from typing import Iterable
 from uuid import UUID
 
 import attrs
@@ -257,6 +256,8 @@ class MemoryDataStore(BaseDataStore):
                 self._logger.debug(
                     "Skipping job %s because task %r has the maximum number of %d jobs "
                     "already running",
+                    job.id,
+                    job.task_id,
                     task.running_jobs,
                 )
                 continue

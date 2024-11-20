@@ -4,14 +4,14 @@ import os
 import platform
 import random
 import sys
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Iterable, Mapping, MutableMapping, Sequence
 from contextlib import AsyncExitStack
 from datetime import datetime, timedelta, timezone
 from functools import partial
 from inspect import isbuiltin, isclass, ismethod, ismodule
 from logging import Logger, getLogger
 from types import TracebackType
-from typing import Any, Callable, Iterable, Literal, Mapping, TypeVar, cast, overload
+from typing import Any, Callable, Literal, TypeVar, cast, overload
 from uuid import UUID, uuid4
 
 import anyio
@@ -81,7 +81,7 @@ else:
 _microsecond_delta = timedelta(microseconds=1)
 _zero_timedelta = timedelta()
 
-TaskType: TypeAlias = "Task | str | Callable"
+TaskType: TypeAlias = "Task | str | Callable[..., Any]"
 T = TypeVar("T")
 
 
@@ -312,7 +312,7 @@ class AsyncScheduler:
         self,
         func_or_task_id: TaskType,
         *,
-        func: Callable | UnsetValue = unset,
+        func: Callable[..., Any] | UnsetValue = unset,
         job_executor: str | UnsetValue = unset,
         misfire_grace_time: float | timedelta | None | UnsetValue = unset,
         max_running_jobs: int | None | UnsetValue = unset,
@@ -348,6 +348,7 @@ class AsyncScheduler:
 
         """
         func_ref: str | None = None
+        task: Task | None = None
         if callable(func_or_task_id):
             task_params = get_task_params(func_or_task_id)
             if task_params.id is unset:
@@ -364,12 +365,26 @@ class AsyncScheduler:
                 metadata=func_or_task_id.metadata,
             )
         elif isinstance(func_or_task_id, str) and func_or_task_id:
-            task_params = get_task_params(func) if callable(func) else TaskParameters()
-            task_params.id = func_or_task_id
+            try:
+                task = await self.data_store.get_task(func_or_task_id)
+                task_params = TaskParameters(
+                    id=task.id,
+                    job_executor=task.job_executor,
+                    max_running_jobs=task.max_running_jobs,
+                    misfire_grace_time=task.misfire_grace_time,
+                    metadata=task.metadata,
+                )
+            except TaskLookupError:
+                task_params = (
+                    get_task_params(func) if callable(func) else TaskParameters()
+                )
+                task_params.id = func_or_task_id
         else:
             raise TypeError(
                 "func_or_task_id must be either a task, its identifier or a callable"
             )
+
+        assert task_params.id
 
         # Apply any settings passed directly to this function as arguments
         if job_executor is not unset:
@@ -393,7 +408,6 @@ class AsyncScheduler:
             self.task_defaults.metadata, task_params.metadata, metadata
         )
 
-        assert task_params.id
         if callable(func):
             self._task_callables[task_params.id] = func
             try:
@@ -403,7 +417,7 @@ class AsyncScheduler:
 
         modified = False
         try:
-            task = await self.data_store.get_task(cast(str, task_params.id))
+            task = task or await self.data_store.get_task(cast(str, task_params.id))
         except TaskLookupError:
             task = Task(
                 id=task_params.id,
@@ -418,25 +432,22 @@ class AsyncScheduler:
             changes: dict[str, Any] = {}
             if func is not unset and task.func != func_ref:
                 changes["func"] = func_ref
-                modified = True
 
             if task_params.job_executor != task.job_executor:
                 changes["job_executor"] = task_params.job_executor
-                modified = True
 
             if task_params.max_running_jobs != task.max_running_jobs:
                 changes["max_running_jobs"] = task_params.max_running_jobs
-                modified = True
 
             if task_params.misfire_grace_time != task.misfire_grace_time:
                 changes["misfire_grace_time"] = task_params.misfire_grace_time
-                modified = True
 
             if task_params.metadata != task.metadata:
                 changes["metadata"] = task_params.metadata
-                modified = True
 
-            task = attrs.evolve(task, **changes)
+            if changes:
+                task = attrs.evolve(task, **changes)
+                modified = True
 
         if modified:
             await self.data_store.add_task(task)
@@ -459,7 +470,7 @@ class AsyncScheduler:
         trigger: Trigger,
         *,
         id: str | None = None,
-        args: Iterable | None = None,
+        args: Iterable[Any] | None = None,
         kwargs: Mapping[str, Any] | None = None,
         paused: bool = False,
         coalesce: CoalescePolicy = CoalescePolicy.latest,
@@ -642,7 +653,7 @@ class AsyncScheduler:
         self,
         func_or_task_id: TaskType,
         *,
-        args: Iterable | None = None,
+        args: Iterable[Any] | None = None,
         kwargs: Mapping[str, Any] | None = None,
         job_executor: str | UnsetValue = unset,
         metadata: MetadataType | UnsetValue = unset,
@@ -745,9 +756,9 @@ class AsyncScheduler:
 
     async def run_job(
         self,
-        func_or_task_id: str | Callable,
+        func_or_task_id: str | Callable[..., Any],
         *,
-        args: Iterable | None = None,
+        args: Iterable[Any] | None = None,
         kwargs: Mapping[str, Any] | None = None,
         job_executor: str | UnsetValue = unset,
         metadata: MetadataType | UnsetValue = unset,
@@ -838,7 +849,7 @@ class AsyncScheduler:
         )
 
     async def run_until_stopped(
-        self, *, task_status: TaskStatus = TASK_STATUS_IGNORED
+        self, *, task_status: TaskStatus[None] = TASK_STATUS_IGNORED
     ) -> None:
         """Run the scheduler until explicitly stopped."""
         if self._state is not RunState.stopped:
@@ -911,7 +922,7 @@ class AsyncScheduler:
                         SchedulerStopped(exception=exception)
                     )
 
-    async def _process_schedules(self, *, task_status: TaskStatus) -> None:
+    async def _process_schedules(self, *, task_status: TaskStatus[None]) -> None:
         wakeup_event = anyio.Event()
         wakeup_deadline: datetime | None = None
 
@@ -1100,7 +1111,7 @@ class AsyncScheduler:
                 f"callable."
             )
 
-    async def _process_jobs(self, *, task_status: TaskStatus) -> None:
+    async def _process_jobs(self, *, task_status: TaskStatus[None]) -> None:
         wakeup_event = anyio.Event()
 
         async def check_queue_capacity(event: Event) -> None:
@@ -1161,7 +1172,7 @@ class AsyncScheduler:
                 await wakeup_event.wait()
                 wakeup_event = anyio.Event()
 
-    async def _run_job(self, job: Job, func: Callable, executor: str) -> None:
+    async def _run_job(self, job: Job, func: Callable[..., Any], executor: str) -> None:
         try:
             # Check if the job started before the deadline
             start_time = datetime.now(timezone.utc)

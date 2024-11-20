@@ -15,6 +15,7 @@ from inspect import signature
 from pathlib import Path
 from queue import Queue
 from types import ModuleType
+from typing import Any
 
 import anyio
 import pytest
@@ -69,10 +70,7 @@ if sys.version_info >= (3, 11):
 else:
     UTC = timezone.utc
 
-if sys.version_info >= (3, 9):
-    from zoneinfo import ZoneInfo
-else:
-    from backports.zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo
 
 pytestmark = pytest.mark.anyio
 
@@ -458,7 +456,7 @@ class TestAsyncScheduler:
     )
     async def test_callable_types(
         self,
-        target: Callable,
+        target: Callable[..., Any],
         expected_result: object,
         use_scheduling: bool,
         raw_datastore: DataStore,
@@ -762,6 +760,33 @@ class TestAsyncScheduler:
 
             with pytest.raises(JobLookupError), fail_after(1):
                 await scheduler.get_job_result(job_id, wait=False)
+
+    async def test_add_job_not_rewriting_task_config(
+        self, raw_datastore: DataStore
+    ) -> None:
+        async with AsyncScheduler(data_store=raw_datastore) as scheduler:
+            TASK_ID = "task_dummy_async_job"
+            JOB_EXECUTOR = "async"
+            MISFIRE_GRACE_TIME = timedelta(seconds=10)
+            MAX_RUNNING_JOBS = 5
+            METADATA = {"key": "value"}
+
+            await scheduler.configure_task(
+                func_or_task_id=TASK_ID,
+                func=dummy_async_job,
+                job_executor=JOB_EXECUTOR,
+                misfire_grace_time=MISFIRE_GRACE_TIME,
+                max_running_jobs=MAX_RUNNING_JOBS,
+                metadata=METADATA,
+            )
+
+            assert await scheduler.add_job(TASK_ID)
+
+            task = await scheduler.data_store.get_task(TASK_ID)
+            assert task.job_executor == JOB_EXECUTOR
+            assert task.misfire_grace_time == MISFIRE_GRACE_TIME
+            assert task.max_running_jobs == MAX_RUNNING_JOBS
+            assert task.metadata == METADATA
 
     async def test_contextvars(self, mocker: MockerFixture, timezone: ZoneInfo) -> None:
         def check_contextvars() -> None:

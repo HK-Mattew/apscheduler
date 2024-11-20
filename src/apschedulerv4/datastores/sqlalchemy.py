@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import AsyncGenerator, Mapping, Sequence
+from collections.abc import AsyncGenerator, Iterable, Mapping, Sequence
 from contextlib import AsyncExitStack, asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from functools import partial
 from logging import Logger
-from typing import Any, Iterable, cast
+from typing import Any, cast
 from uuid import UUID
 
 import anyio
@@ -48,6 +48,7 @@ from sqlalchemy.exc import (
 )
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, create_async_engine
 from sqlalchemy.future import Connection, Engine
+from sqlalchemy.schema import CreateSchema
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql.ddl import DropTable
 from sqlalchemy.sql.elements import BindParameter, literal
@@ -389,6 +390,12 @@ class SQLAlchemyDataStore(BaseExternalDataStore):
         async for attempt in self._retry():
             with attempt:
                 async with self._begin_transaction() as conn:
+                    # Create the schema first if it doesn't exist yet
+                    if self.schema:
+                        await self._execute(
+                            conn, CreateSchema(name=self.schema, if_not_exists=True)
+                        )
+
                     if self.start_from_scratch:
                         for table in self._metadata.sorted_tables:
                             await self._execute(conn, DropTable(table, if_exists=True))

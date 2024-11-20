@@ -3,13 +3,13 @@ from __future__ import annotations
 import atexit
 import sys
 import threading
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Iterable, Mapping, MutableMapping, Sequence
 from contextlib import ExitStack
 from datetime import datetime, timedelta
 from functools import partial
 from logging import Logger
 from types import TracebackType
-from typing import Any, Callable, Iterable, Literal, Mapping, overload
+from typing import Any, Callable, Literal, overload
 from uuid import UUID
 
 import attrs
@@ -235,7 +235,7 @@ class Scheduler:
         self,
         func_or_task_id: TaskType,
         *,
-        func: Callable | UnsetValue = unset,
+        func: Callable[..., Any] | UnsetValue = unset,
         job_executor: str | UnsetValue = unset,
         misfire_grace_time: float | timedelta | None | UnsetValue = unset,
         max_running_jobs: int | None | UnsetValue = unset,
@@ -264,7 +264,7 @@ class Scheduler:
         trigger: Trigger,
         *,
         id: str | None = None,
-        args: Iterable | None = None,
+        args: Iterable[Any] | None = None,
         kwargs: Mapping[str, Any] | None = None,
         paused: bool = False,
         coalesce: CoalescePolicy = CoalescePolicy.latest,
@@ -330,7 +330,7 @@ class Scheduler:
         self,
         func_or_task_id: TaskType,
         *,
-        args: Iterable | None = None,
+        args: Iterable[Any] | None = None,
         kwargs: Mapping[str, Any] | None = None,
         job_executor: str | UnsetValue = unset,
         metadata: MetadataType | UnsetValue = unset,
@@ -361,9 +361,9 @@ class Scheduler:
 
     def run_job(
         self,
-        func_or_task_id: str | Callable,
+        func_or_task_id: str | Callable[..., Any],
         *,
-        args: Iterable | None = None,
+        args: Iterable[Any] | None = None,
         kwargs: Mapping[str, Any] | None = None,
         job_executor: str | UnsetValue = unset,
         metadata: MetadataType | UnsetValue = unset,
